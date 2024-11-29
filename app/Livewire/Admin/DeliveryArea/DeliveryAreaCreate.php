@@ -1,0 +1,56 @@
+<?php
+
+namespace App\Livewire\Admin\DeliveryArea;
+
+use App\Models\DeliveryArea;
+use Livewire\Attributes\Layout;
+use Livewire\Component;
+
+#[Layout('layouts.admin.master')]
+class DeliveryAreaCreate extends Component
+{
+    public $saved = false;
+    public $area_name,$min_delivery_time,$max_delivery_time,$delivery_fee,$status;
+
+    public function render()
+    {
+        return view('livewire.admin.delivery-area.delivery-area-create');
+    }
+    public function alertSuccess($rel)
+    {
+        $this->dispatch('alert',
+            ['types' => 'success',  'message' => $rel]);
+    }
+    public function alertDelete($rel)
+    {
+        $this->dispatch('alert',
+            ['types' => 'error',  'message' => $rel]);
+    }
+    public function save()
+    {
+        $this->validate([
+            'area_name' => ['required', 'max:255'],
+            'min_delivery_time' => ['required', 'max:255'],
+            'max_delivery_time' => ['required', 'max:255'],
+            'delivery_fee' => ['required', 'numeric'],
+            'status' => ['required', 'boolean'],
+        ],[
+            'area_name.required' => 'Area Name Required',
+            'min_delivery_time.required' => 'Min Delivery Time Required',
+            'max_delivery_time.required' => 'Max Delivery Time Required',
+            'delivery_fee.required' => 'Delivery Fee Required',
+            'status.required' => 'Status Required',
+        ]);
+
+        $area = new DeliveryArea();
+        $area->area_name = $this->area_name;
+        $area->min_delivery_time = $this->min_delivery_time;
+        $area->max_delivery_time = $this->max_delivery_time;
+        $area->delivery_fee = $this->delivery_fee;
+        $area->status = $this->status;
+        $area->save();
+
+        $this->alertSuccess('Created Successfully');
+        return redirect()->to(route('admin.delivery-area.index'));
+    }
+}
